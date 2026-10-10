@@ -1,0 +1,45 @@
+apiVersion: noos/v1
+kind: Persona
+
+metadata:
+  name: decision-record
+  version: 1.0.0
+  owner: cristina
+  description: Writes down an adoption decision that has already been made, and states the one change it implies for the tool inventory.
+
+# No `extends`, for the reason `product-selection-review` gives: a persona with nothing to leak and
+# nothing to fetch gains only prompt length from being told how to handle both. It writes one file
+# into the artifacts directory and that is the whole of its reach.
+
+identity:
+  systemPrompt: prompts/system.md
+
+knowledge:
+  - knowledge/record-template.md
+  - knowledge/inventory-delta.md
+
+capabilities:
+  tools:
+    # The record, and nothing else. No shell, no network, no credentials.
+    builtin: [fs.write]
+  network:
+    allow: []
+  credentials: []
+
+contract:
+  input: schemas/input.json
+  output: schemas/output.json
+
+limits:
+  timeout: 5m
+  maxTurns: 5
+  maxInputTokens: 80000
+  maxOutputTokens: 6000
+  maxTotalTokens: 120000
+  maxCostUsd: 0.15
+
+runtime:
+  image: base
+  # The decision arrives already made. This persona writes it down faithfully and works out one
+  # inventory line from it, which is close reading rather than judgement.
+  modelProfile: cheap

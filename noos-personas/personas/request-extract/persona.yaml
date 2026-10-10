@@ -1,0 +1,49 @@
+apiVersion: noos/v1
+kind: Persona
+
+metadata:
+  name: request-extract
+  version: 1.0.0
+  owner: cristina
+  description: Reads an adoption request as it was written and fills in the review form, marking what the request never said instead of guessing it.
+
+# No `extends`. The baseline's four rules are about credentials, fetched content, refused hosts and
+# the filesystem, and this persona touches none of those: it is handed a block of text and answers
+# about that text. Naming a capability in a prompt is how a model learns to look for it, so the
+# sandboxed personas here are told nothing about boundaries they cannot reach. Same reasoning as
+# `laya`, `product-selection-review` and `fortune-cookie`; see the registry README.
+
+identity:
+  systemPrompt: prompts/system.md
+
+knowledge:
+  - knowledge/the-fields.md
+  - knowledge/what-counts-as-stated.md
+
+capabilities:
+  # Nothing at all. It reads the request it was given and returns a form. There is no report to
+  # write, so not even fs.write: a persona whose whole discipline is "do not add anything that was
+  # not there" has no business holding a tool that writes.
+  tools: {}
+  network:
+    allow: []
+  credentials: []
+
+contract:
+  input: schemas/input.json
+  output: schemas/output.json
+
+limits:
+  timeout: 5m
+  maxTurns: 4
+  maxInputTokens: 80000
+  maxOutputTokens: 4000
+  maxTotalTokens: 100000
+  maxCostUsd: 0.10
+
+runtime:
+  image: base
+  # Copying stated facts into named fields and noticing which fields nothing answered. The judgement
+  # that costs money happens downstream in `product-selection-review`; paying for a capable model to
+  # transcribe would be paying twice. The same argument `request-triage` makes for `cheap`.
+  modelProfile: cheap

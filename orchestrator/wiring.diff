@@ -1,0 +1,46 @@
+diff --git a/docker-compose.yml b/docker-compose.yml
+index 03e9e43..6dc8d22 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -53,6 +53,12 @@ services:
+       Orchestrator__Personas__MaintainabilityReviewer: ${PERSONA_MAINTAINABILITY_REVIEWER:-maintainability-reviewer@1}
+       Orchestrator__Personas__Synthesizer: ${PERSONA_SYNTHESIZER:-synthesizer@1}
+       Orchestrator__Personas__Planner: ${PERSONA_PLANNER:-planner@1}
++      # AdoptionIntake. Unlike the roles above these are real personas in the registry: a calibrated triage, the
++      # form extractor, the reviewer and the record writer.
++      Orchestrator__Personas__RequestTriage: ${PERSONA_REQUEST_TRIAGE:-request-triage@1}
++      Orchestrator__Personas__RequestExtract: ${PERSONA_REQUEST_EXTRACT:-request-extract@1}
++      Orchestrator__Personas__ProductSelectionReview: ${PERSONA_PRODUCT_SELECTION_REVIEW:-product-selection-review@1}
++      Orchestrator__Personas__DecisionRecord: ${PERSONA_DECISION_RECORD:-decision-record@1}
+       OpenTelemetry__OtlpEndpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+     healthcheck:
+       test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf \"GET /health/ready HTTP/1.0\\r\\n\\r\\n\" >&3 && head -n1 <&3 | grep -q 200'"]
+diff --git a/src/Noos.Orchestrator.Activities/OrchestratorOptions.cs b/src/Noos.Orchestrator.Activities/OrchestratorOptions.cs
+index 0994179..8819a58 100644
+--- a/src/Noos.Orchestrator.Activities/OrchestratorOptions.cs
++++ b/src/Noos.Orchestrator.Activities/OrchestratorOptions.cs
+@@ -35,6 +35,12 @@ public sealed class OrchestratorOptions
+         ["MaintainabilityReviewer"] = "maintainability-reviewer@1",
+         ["Synthesizer"] = "synthesizer@1",
+         ["Planner"] = "planner@1",
++        // AdoptionIntake. These four are real personas in the registry rather than the generic roles above: a calibrated
++        // triage, the form extractor, the reviewer and the record writer.
++        ["RequestTriage"] = "request-triage@1",
++        ["RequestExtract"] = "request-extract@1",
++        ["ProductSelectionReview"] = "product-selection-review@1",
++        ["DecisionRecord"] = "decision-record@1",
+     };
+ 
+     /// <summary>Maximum developer/review iterations in FeatureDelivery before escalating to a human.</summary>
+diff --git a/src/Noos.Orchestrator/Workflows/WorkflowCatalog.cs b/src/Noos.Orchestrator/Workflows/WorkflowCatalog.cs
+index c0bc554..bff7256 100644
+--- a/src/Noos.Orchestrator/Workflows/WorkflowCatalog.cs
++++ b/src/Noos.Orchestrator/Workflows/WorkflowCatalog.cs
+@@ -12,6 +12,7 @@ public static class WorkflowCatalog
+         new("ResearchAndWrite", "noos-research-and-write", "Researcher, Writer, Editor, then a human review before the final output."),
+         new("ParallelReview", "noos-parallel-review", "Several reviewer personas in parallel, joined, then a Synthesizer merges the findings."),
+         new("DynamicRouter", "noos-dynamic-router", "A Planner returns a plan of personas; the plan is validated against the available personas and run step by step."),
++        new("AdoptionIntake", "noos-adoption-intake", "Triages a tool adoption request, extracts the review form, reviews it when the route asks for one, takes a human decision and records it. Input: {title, body, requestedBy?}."),
+     ];
+ 
+     public static WorkflowInfo? Find(string name) => All.FirstOrDefault(w => string.Equals(w.Name, name, StringComparison.OrdinalIgnoreCase) || string.Equals(w.DefinitionId, name, StringComparison.OrdinalIgnoreCase));

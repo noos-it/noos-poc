@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "title": "A decision that has already been made",
+  "description": "Everything the pipeline learned about one adoption request, plus what the person decided. Assembled by the orchestrator; the review fields are absent when no review ran.",
+  "properties": {
+    "title": { "type": "string", "title": "The request, in one line", "maxLength": 200 },
+    "requestedBy": { "type": "string", "maxLength": 120 },
+    "tool": { "type": "string", "title": "Tool proposed", "maxLength": 120 },
+    "vendor": { "type": "string", "maxLength": 120 },
+    "category": {
+      "type": "string",
+      "enum": ["observability", "ci-cd", "source-control", "data-and-analytics", "security", "collaboration", "design", "ai-and-ml", "infrastructure", "testing", "language-and-tooling", "other"]
+    },
+    "cost": { "type": "string", "maxLength": 600 },
+    "dataHandled": {
+      "type": "string",
+      "enum": ["none", "internal-only", "customer-personal", "special-category", "unknown"]
+    },
+    "usersAffected": { "type": "integer", "minimum": 1, "maximum": 10000 },
+
+    "route": {
+      "type": "string",
+      "enum": ["send-back", "full-review", "fast-track"],
+      "title": "How triage routed it"
+    },
+    "scrutiny": { "type": "number", "minimum": 1, "maximum": 5 },
+    "lowConfidence": {
+      "type": "boolean",
+      "description": "Triage's own warning that the numbers behind the route were soft. Recorded because it changes how much the route is worth as evidence later."
+    },
+    "triageNote": { "type": "string", "maxLength": 400 },
+    "missing": {
+      "type": "array",
+      "title": "Fields the request never answered",
+      "items": { "type": "string", "maxLength": 40 },
+      "maxItems": 8
+    },
+
+    "reviewVerdict": {
+      "type": "string",
+      "enum": ["adopt", "adopt-with-conditions", "revise-proposal", "decline", "insufficient-information"],
+      "description": "Absent when no review ran, which is the normal case on fast-track and send-back."
+    },
+    "reviewSummary": { "type": "string", "maxLength": 600 },
+    "overlapsWith": {
+      "type": "array",
+      "title": "Tools already in the inventory that do some of this job",
+      "items": { "type": "string", "maxLength": 120 },
+      "maxItems": 10
+    },
+    "openQuestions": { "type": "integer", "minimum": 0 },
+    "blockers": { "type": "integer", "minimum": 0 },
+
+    "decision": {
+      "type": "string",
+      "enum": ["approve", "reject", "edit"],
+      "title": "What the person decided",
+      "description": "The decision as the review endpoint recorded it. This persona records it; it does not weigh it."
+    },
+    "decisionComment": { "type": "string", "title": "What the decider wrote", "maxLength": 4000 },
+    "decidedBy": { "type": "string", "maxLength": 200 },
+    "decidedAt": { "type": "string", "format": "date-time" }
+  },
+  "required": ["title", "route", "decision"],
+  "additionalProperties": false
+}
