@@ -138,9 +138,15 @@ Wrong is not.
 
 ### How a record gets here
 
-As a pull request, one record per branch, named `decision/<identifier>`. Nothing is merged
-automatically: whoever reviews the pull request decides when it lands, and updating the index table in
-`decisions/README.md` is part of that review rather than something a machine does around you.
+As a pull request, one record per branch, named `decision/<identifier>`. The orchestrator opens it
+directly — creating the branch, committing the one file and opening the pull request. No model is
+involved in that step: it is four API calls in a fixed order over a record that is already final, and
+a record is text somebody outside the process wrote, so nothing reads it while holding a credential
+that can change a repository.
+
+Nothing is merged automatically. Whoever reviews the pull request decides when it lands, and updating
+the index table in `decisions/README.md` is part of that review rather than something a machine does
+around you.
 
 The decision is made and recorded before any of that. If this repository cannot be written to, the
 record still exists as an artifact of the run and the publishing step is what failed — a delivery
