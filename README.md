@@ -3,7 +3,7 @@
 How a request to adopt a new tool becomes a decision, and where the decisions live.
 
 ```
-decisions/     one record per decision, named <date>-<tool>.md
+decisions/     one record per decision, named <identifier>.md
 ```
 
 Every adoption decision gets a record, including the ones nobody argued about. A record exists so
@@ -67,6 +67,25 @@ establish, named as a fault in the document rather than in the person who wrote 
 job, because a reader deciding should see them. Adopting something that overlaps is a normal
 outcome; adopting it without anyone noticing the overlap is not.
 
+## Every decision has an identifier
+
+```
+20261010-linear-7b248dd7b188
+└─ decided  └─ tool  └─ the run that produced it
+```
+
+The last twelve characters are the start of the workflow instance id, so a record, its file name and
+the branch of the pull request that adds it all carry the same identifier, and all three trace back
+to the run — its step log, and every persona call behind it. The identifier is computed by the
+orchestrator, not written by a model: a generated value would be unique and would correlate to
+nothing, which is the one property it exists to have.
+
+Because it is derived rather than generated, the same decision always names the same branch. Publish
+it twice and the existing pull request is updated; it does not open a second one.
+
+Records from before this existed keep their old names. They are read by the same lookup, which falls
+back to the heading when there is no front matter, so nothing had to be renamed.
+
 ## Deciding
 
 Approve, reject, or edit. Whatever you write in the comment becomes the record, so **conditions
@@ -75,6 +94,32 @@ preserved as an obligation.
 
 A rejection that asks for a resubmission is recorded as *sent back*, not *declined*. The difference
 matters to whoever picks it up later.
+
+## When a tool has been through here before
+
+Before anything is reviewed, the process reads the records in this repository and looks for the tool
+being proposed — and for other tools in the same category, which is where an overlap the inventory
+has not caught up with will show.
+
+If it finds one, the decider is told **first**, above the request and above any review. The case this
+guards against is a tool declined last year coming back on the fast track, where by definition nobody
+is spending a review on noticing.
+
+**A repeat is a fact about the request, not a verdict on it.** Asking again is how the process is
+supposed to work:
+
+| Previously | What the question actually is |
+|---|---|
+| **Declined** | Has the blocker been answered? Often it has — that is why people are allowed to ask twice. |
+| **Sent back** | Is what was missing now there? This is a send-back working. |
+| **Adopted** | Usually more seats or another team. Occasionally nobody knew it was already running, and the inventory is stale. |
+
+What a record said then is not what is true now. A record naming a missing DPA a year ago does not
+mean there is still no DPA — it is a question to put to the proposal, never a fact about the tool.
+
+**"No history" and "nobody could check" are different answers**, and the process keeps them apart. If
+this repository cannot be read, the decider is told that in those words and the record says so under
+*What was not known*. Silence is never allowed to read as a clean record.
 
 ## The records
 
@@ -90,6 +135,16 @@ retire it. An overlap that a decision went ahead over is recorded as *accepted*,
 quietly retiring something nobody agreed to retire would leave the next review reasoning from an
 inventory that is wrong, which is worse than one that is stale. Stale is visible from the dates.
 Wrong is not.
+
+### How a record gets here
+
+As a pull request, one record per branch, named `decision/<identifier>`. Nothing is merged
+automatically: whoever reviews the pull request decides when it lands, and updating the index table in
+`decisions/README.md` is part of that review rather than something a machine does around you.
+
+The decision is made and recorded before any of that. If this repository cannot be written to, the
+record still exists as an artifact of the run and the publishing step is what failed — a delivery
+problem, visible in the step log, not a lost decision.
 
 ### Applying the inventory change
 
