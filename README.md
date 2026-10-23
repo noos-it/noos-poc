@@ -10,6 +10,8 @@ Every adoption decision gets a record, including the ones nobody argued about. A
 that somebody in two years, looking at a tool nobody remembers choosing, can find out why — and can
 tell the difference between a thing that was examined and a thing that merely went through.
 
+The records and their index are in [decisions/](decisions/README.md).
+
 ## Submitting a request
 
 Write it as prose. There is no form to fill in: the process reads what you wrote and works out which

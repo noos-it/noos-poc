@@ -14,6 +14,6 @@ was tracked, not here.
 
 | Date | Tool | Outcome | Inventory |
 |---|---|---|---|
-| 2026-10-10 | GitHub Copilot Business | Adopted with conditions | Add under *AI and ML* — not yet applied |
-| 2026-10-10 | Linear | Sent back | No change |
-| 2026-10-10 | Linear *(2nd attempt)* | Adopted with conditions | Add under *Collaboration* — not yet applied |
+| 2026-10-10 | [GitHub Copilot Business](2026-10-10-github-copilot-business.md) | Adopted with conditions | Add under *AI and ML* — not yet applied |
+| 2026-10-10 | [Linear](2026-10-10-linear.md) | Sent back | No change |
+| 2026-10-10 | [Linear *(2nd attempt)*](20261010-linear-7b248dd7b188.md) | Adopted with conditions | Add under *Collaboration* — not yet applied |
