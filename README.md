@@ -160,7 +160,25 @@ inventory line changes when a person changes it, in `noos-personas`, where
 
 ## Where the process is implemented
 
-The pipeline runs on the Noos orchestrator as the `AdoptionIntake` workflow, over four personas —
-`request-triage`, `request-extract`, `product-selection-review` and `decision-record`. Those live in
-`noos-personas` and `noos-workflow`. This repository holds the process and its output, not its
-implementation.
+The pipeline runs on the Noos orchestrator as the `AdoptionIntake` workflow
+([noos-workflow](https://github.com/noos-it/noos-workflow), `src/Noos.Orchestrator/Workflows/AdoptionIntake.cs`).
+The personas it calls live in [noos-personas](https://github.com/noos-it/noos-personas). This repository
+holds the process and its output, not its implementation.
+
+| Step | Done by | Runs |
+|---|---|---|
+| Triage | Jev, called directly by the `TriageRequest` activity: one HTTP call, no language model. The route comes from its scores through a written rule (`TriageRule`). | every request |
+| The review form | `request-extract` persona: fills `tool`, `problem`, `reasoning` and the rest from the prose, and lists what is `missing` | every route, including send-back |
+| History | `decision-history` persona: reads the records in this repository for the same tool and the same category | every route; a repository it cannot read is reported as `reachable: false`, never as "no history" |
+| Review | `product-selection-review` persona | only when the route is `full-review` **and** the form is reviewable |
+| Decision | a person, through a `HumanReview` task (the noos-clients inbox or the orchestrator API) | every route |
+| Record | `decision-record` persona: the Markdown record and its inventory line | every route |
+| Publish | `PublishDecision` activity: branch, commit, pull request against this repository | every route; skipped and reported as not published when no token is configured |
+
+`request-triage` still exists in the registry as a persona, but this workflow no longer calls it.
+
+The orchestrator reads and writes this repository through one pair of settings, so the reader and the
+writer cannot point at different places: `Orchestrator__Decisions__Repository` (default
+`noos-it/noos-poc`), `Orchestrator__Decisions__Path` (default `decisions`), `Orchestrator__Decisions__Ref`,
+and `Orchestrator__Decisions__Token` for publishing (a fine-grained token with contents and pull-request
+write on this repository alone; empty means decisions are recorded but not published).
